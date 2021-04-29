@@ -5,6 +5,7 @@ To run the project please use the LTS version of nodejs, docker and compose are 
 - install dependencies with `npm install`
 - run the kafka and zookeeper infrastructure with `docker-compose up -d`
 - run the development server with `npm start`
+- `npm run flood` will send 100 random messages to the kafka queue
 
 It runs when both the server and the client are running on localhost as
 for now it has no configuration files nor environment variables to specify
