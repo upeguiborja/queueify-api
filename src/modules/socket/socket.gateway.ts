@@ -1,26 +1,28 @@
-import { Logger } from '@nestjs/common';
 import {
-  OnGatewayConnection,
-  OnGatewayDisconnect,
-  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Socket, Server } from 'socket.io';
+import { Logger } from '@nestjs/common';
+import { Server, Socket } from 'socket.io';
+import { KafkaService } from 'src/kafka/kafka.service';
 
 @WebSocketGateway()
-export class SocketGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class SocketGateway {
   @WebSocketServer() server: Server;
+
+  constructor(private readonly kafkaService: KafkaService) {
+    this.kafkaService.init('test_group');
+  }
 
   private logger: Logger = new Logger('SocketGateway');
 
   @SubscribeMessage('clientMessage')
-  public handleMessage(client: Socket, payload: string): void {
+  public async handleMessage(client: Socket, payload: string): Promise<void> {
     this.logger.log(
       `Message incoming - client: ${client.id}, payload: ${payload}`,
     );
+    await this.kafkaService.sendMessage(payload, 'test_topic');
     this.server.emit('serverMessage', payload);
   }
 

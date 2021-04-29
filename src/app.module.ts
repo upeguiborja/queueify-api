@@ -3,12 +3,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import { KafkaModule } from './kafka/kafka.module';
-import { SocketGateway } from './socket.gateway';
+import { SocketModule } from './modules/socket/socket.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, KafkaModule],
+  imports: [AuthModule, UsersModule, SocketModule],
   controllers: [AppController],
-  providers: [AppService, SocketGateway],
+  providers: [AppService],
 })
 export class AppModule {}
