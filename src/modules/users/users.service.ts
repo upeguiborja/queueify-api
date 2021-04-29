@@ -8,15 +8,13 @@ export type User = {
 
 @Injectable()
 export class UsersService {
-  //TODO: Do this in a db (mongo)
-  private readonly users = [
+  //TODO: Could do this in a db (probably mongo) but time ran out
+  private users = [
     {
-      userId: 1,
       email: 'john@gmail.com',
       password: 'changeme',
     },
     {
-      userId: 2,
       email: 'john2@gmail.com',
       password: 'changeme',
     },
@@ -24,5 +22,11 @@ export class UsersService {
 
   async findOne(email: string): Promise<User> {
     return this.users.find((user) => user.email === email);
+  }
+
+  async addOne(email: string, password): Promise<User> {
+    const newUser: User = { email: email, password: password };
+    this.users.push(newUser);
+    return newUser;
   }
 }
