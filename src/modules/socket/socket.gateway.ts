@@ -24,8 +24,9 @@ export class SocketGateway {
     this.server.emit('serverMessage', payload);
   }
 
-  afterInit(server: Server) {
+  async afterInit(server: Server) {
     this.logger.log('-- Socket IO Server Init --');
+    await this.kafkaService.init('test_group');
   }
 
   async handleDisconnect(client: Socket) {
@@ -35,9 +36,8 @@ export class SocketGateway {
 
   async handleConnection(client: Socket) {
     this.logger.log(`Client connected: ${client.id}`);
-    await this.kafkaService.init('test_group');
     this.kafkaService.subscribeTopic('test_topic').subscribe((data) => {
-      this.server.emit('serverMessage', data);
+      this.server.emit('serverMessage', data.value.toString());
     });
   }
 }
