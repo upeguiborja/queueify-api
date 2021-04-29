@@ -11,9 +11,7 @@ import { KafkaService } from 'src/kafka/kafka.service';
 export class SocketGateway {
   @WebSocketServer() server: Server;
 
-  constructor(private readonly kafkaService: KafkaService) {
-    this.kafkaService.init('test_group');
-  }
+  constructor(private readonly kafkaService: KafkaService) {}
 
   private logger: Logger = new Logger('SocketGateway');
 
@@ -30,11 +28,16 @@ export class SocketGateway {
     this.logger.log('-- Socket IO Server Init --');
   }
 
-  handleDisconnect(client: Socket) {
+  async handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
+    await this.kafkaService.disconnect();
   }
 
-  handleConnection(client: Socket) {
+  async handleConnection(client: Socket) {
     this.logger.log(`Client connected: ${client.id}`);
+    await this.kafkaService.init('test_group');
+    this.kafkaService.subscribeTopic('test_topic').subscribe((data) => {
+      this.server.emit('serverMessage', data);
+    });
   }
 }

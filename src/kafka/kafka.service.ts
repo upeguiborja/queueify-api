@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Consumer, Kafka, Producer } from 'kafkajs';
+import { Consumer, Kafka, KafkaMessage, Producer } from 'kafkajs';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class KafkaService {
@@ -26,5 +27,21 @@ export class KafkaService {
       topic: topic,
       messages: [{ value: message }],
     });
+  }
+
+  subscribeTopic(topic: string): Observable<KafkaMessage> {
+    this.kafkaConsumer.subscribe({ topic: topic, fromBeginning: true });
+    return new Observable((subscriber) => {
+      this.kafkaConsumer.run({
+        eachMessage: async ({ topic, partition, message }) => {
+          subscriber.next(message);
+        },
+      });
+    });
+  }
+
+  async disconnect() {
+    await this.kafkaConsumer.disconnect();
+    await this.kafkaProducer.disconnect();
   }
 }
