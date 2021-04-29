@@ -25,10 +25,8 @@ export class UsersService {
   }
 
   async addOne(email: string, password: string): Promise<User> {
-    console.log(this.users);
     const newUser: User = { email: email, password: password };
     this.users.push(newUser);
-    console.log(this.users);
     return newUser;
   }
 }
